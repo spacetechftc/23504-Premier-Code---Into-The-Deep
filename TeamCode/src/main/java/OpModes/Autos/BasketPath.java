@@ -11,23 +11,24 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.rowanmcalpin.nextftc.core.command.Command;
 import com.rowanmcalpin.nextftc.core.command.groups.ParallelGroup;
 import com.rowanmcalpin.nextftc.core.command.groups.SequentialGroup;
-import com.rowanmcalpin.nextftc.core.command.utility.delays.Delay;
 import com.rowanmcalpin.nextftc.pedro.FollowPath;
 import com.rowanmcalpin.nextftc.pedro.PedroOpMode;
 
 import LIb.pedroPathing.constants.FConstants;
 import LIb.pedroPathing.constants.LConstants;
 
-import Subsystems.Lift;
 
+import Subsystems.Liftl;
+import Subsystems.Liftr;
 import Subsystems.Values.RConstants;
 
 @Autonomous(name = "Basket Auto", group = "sides")
 public class BasketPath extends PedroOpMode {
 
     public BasketPath() {
-        super(Lift.INSTANCE);
+        super(Liftl.INSTANCE, Liftr.INSTANCE);
     }
+
 
 
     private final Pose startPose = new Pose(8.5, 112.1, Math.toRadians(0));  // Starting position
@@ -104,13 +105,13 @@ public class BasketPath extends PedroOpMode {
 
     public Command preload() {
         return new SequentialGroup(
+
                 new ParallelGroup(
-                        new FollowPath(scorePreload),
-                        Lift.INSTANCE.toTarget(RConstants.HIGHBASKET)
-
-
+                        new FollowPath(scorePreload, true),
+                        Liftl.INSTANCE.toTarget(RConstants.HIGHBASKET),
+                        Liftr.INSTANCE.toTarget(RConstants.HIGHBASKET)
                 ),
-                new Delay(0.1),
+
                 new FollowPath(grabPickup1),
                 new FollowPath(scorePickup1),
                 new FollowPath(grabPickup2),
