@@ -9,7 +9,6 @@ import com.pedropathing.pathgen.PathChain;
 import com.pedropathing.pathgen.Point;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.rowanmcalpin.nextftc.core.command.Command;
-import com.rowanmcalpin.nextftc.core.command.groups.ParallelGroup;
 import com.rowanmcalpin.nextftc.core.command.groups.SequentialGroup;
 import com.rowanmcalpin.nextftc.pedro.FollowPath;
 import com.rowanmcalpin.nextftc.pedro.PedroOpMode;
@@ -18,15 +17,14 @@ import LIb.pedroPathing.constants.FConstants;
 import LIb.pedroPathing.constants.LConstants;
 
 
-import Subsystems.Liftl;
-import Subsystems.Liftr;
+import Subsystems.Lift;
 import Subsystems.Values.RConstants;
 
 @Autonomous(name = "Basket Auto", group = "sides")
 public class BasketPath extends PedroOpMode {
 
     public BasketPath() {
-        super(Liftl.INSTANCE, Liftr.INSTANCE);
+        super(Lift.INSTANCE);
     }
 
 
@@ -105,13 +103,7 @@ public class BasketPath extends PedroOpMode {
 
     public Command preload() {
         return new SequentialGroup(
-
-                new ParallelGroup(
-                        new FollowPath(scorePreload, true),
-                        Liftl.INSTANCE.toTarget(RConstants.HIGHBASKET),
-                        Liftr.INSTANCE.toTarget(RConstants.HIGHBASKET)
-                ),
-
+                new FollowPath(scorePreload, true).withDeadline(Lift.INSTANCE.toTarget(RConstants.HIGHBASKET)),
                 new FollowPath(grabPickup1),
                 new FollowPath(scorePickup1),
                 new FollowPath(grabPickup2),
@@ -148,5 +140,6 @@ public class BasketPath extends PedroOpMode {
 
 
     }
+
 
 }
