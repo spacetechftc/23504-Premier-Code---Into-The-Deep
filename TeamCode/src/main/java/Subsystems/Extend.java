@@ -37,6 +37,13 @@ public class Extend extends Subsystem {
 
     }
 
+    public Command extended() {
+        return new RunToPosition(Extend,
+                RConstants.EXTEND_EXTENDED,
+                e_controller);
+
+    }
+
     @Override
     public void initialize(){
         Extend = new MotorEx(ename);

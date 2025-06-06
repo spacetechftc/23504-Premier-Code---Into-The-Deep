@@ -33,6 +33,8 @@ public class TeleOpPremier extends NextFTCOpMode {
 
     public Command driverControlled;
 
+    double outpower;
+    double extendpower;
 
 
     @Override
@@ -43,10 +45,10 @@ public class TeleOpPremier extends NextFTCOpMode {
         frontRightMotor = new MotorEx(frontRightName);
 
         // Change your motor directions to suit your robot.
-        frontLeftMotor.setDirection(DcMotorSimple.Direction.FORWARD);
-        backLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-        frontRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-        backRightMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+        frontLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        backLeftMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+        frontRightMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+        backRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
         motors = new MotorEx[] {frontLeftMotor, frontRightMotor, backLeftMotor, backRightMotor};
 
@@ -59,46 +61,43 @@ public class TeleOpPremier extends NextFTCOpMode {
         driverControlled = new MecanumDriverControlled(motors, gamepadManager.getGamepad1());
         driverControlled.invoke();
 
-        if(Intake.INSTANCE.state == 0 || Intake.INSTANCE.state == 2) {
-            gamepadManager.getGamepad2().getLeftBumper().setPressedCommand(
-                    () -> new SequentialGroup(
-                            Intake.INSTANCE.vertColet()
-                    )
-            );
-        }  else if (Intake.INSTANCE.state == 1){
-            gamepadManager.getGamepad2().getLeftBumper().setPressedCommand(
-                    () -> new SequentialGroup(
-                            Intake.INSTANCE.hoColet()
-                    )
-            );
-        }
 
+        Lift.INSTANCE.getDefaltCommand();
 
         gamepadManager.getGamepad2().getB().setPressedCommand(
-                () -> new SequentialGroup(
-                        Intake.INSTANCE.CloseClaw().and(Outtake.INSTACE.openClaw()),
-                        Intake.INSTANCE.tranf().withDeadline(Extend.INSTANCE.retract()),
-                        Outtake.INSTACE.closeClaw()
-                )
+                () -> Intake.INSTANCE.coletControl()
         );
 
-        if(Outtake.INSTACE.ClawOut.getPosition() < 1){
-            gamepadManager.getGamepad2().getLeftBumper().setPressedCommand(
-                    () -> new SequentialGroup(
-                            Outtake.INSTACE.openClaw()
-                    )
-            );
-        } else if (Outtake.INSTACE.ClawOut.getPosition() == 1){
-            gamepadManager.getGamepad2().getLeftBumper().setPressedCommand(
-                    () -> new SequentialGroup(
-                            Outtake.INSTACE.closeClaw()
-                    )
-            );
-        }
+        gamepadManager.getGamepad2().getRightTrigger().setPressedCommand(
+                value -> Intake.INSTANCE.clawControl()
+        );
 
 
-        Extend.INSTANCE.powerControl(gamepadManager.getGamepad2().getRightStick().getY());
-        Lift.INSTANCE.powerControl(gamepadManager.getGamepad2().getLeftStick().getY());
+
+
+        gamepadManager.getGamepad2().getY().setPressedCommand(
+                () -> Extend.INSTANCE.powerControl(1)
+        );
+        gamepadManager.getGamepad2().getY().setReleasedCommand(
+                () -> Extend.INSTANCE.powerControl(0)
+        );
+
+        gamepadManager.getGamepad2().getA().setPressedCommand(
+                () -> Extend.INSTANCE.powerControl(-1)
+        );
+
+        gamepadManager.getGamepad2().getA().setReleasedCommand(
+                () -> Extend.INSTANCE.powerControl(0)
+        );
+
+
+
+        gamepadManager.getGamepad2().getDpadUp().setPressedCommand(Lift.INSTANCE::toHigh);
+        gamepadManager.getGamepad2().getDpadDown().setPressedCommand(Lift.INSTANCE::toLow);
+
+
+
+
 
 
 
@@ -107,4 +106,5 @@ public class TeleOpPremier extends NextFTCOpMode {
 
 
     }
+
 }

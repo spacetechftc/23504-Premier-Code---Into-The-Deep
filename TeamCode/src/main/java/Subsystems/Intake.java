@@ -20,23 +20,36 @@ public class Intake extends Subsystem {
     public Servo lDiff;
     public Servo rDiff;
     public Servo clawIn;
+    public boolean clawstate;
 
     public String lname = "l_Diff";
     public String rname = "r_Diff";
     public String cname = "clawIn";
 
     public int state;
+    boolean coletstate;
 
     public Command CloseClaw(){
+        clawstate = false;
         return new ServoToPosition(clawIn, // SERVO TO MOVE
                 1, // POSITION TO MOVE TO
                 this); //
+
+
     }
 
     public Command OpenClaw(){
+        clawstate = true;
         return new ServoToPosition(clawIn, // SERVO TO MOVE
                 0, // POSITION TO MOVE TO
                 this); //
+
+    }
+
+    public Command clawControl(){
+        if(clawstate == true){return CloseClaw();} else {
+            return OpenClaw();
+        }
     }
 
     public Command diffControl(double rotation, double inclination){
@@ -53,7 +66,7 @@ public class Intake extends Subsystem {
 
 
     public Command vertColet(){
-        state = 1;
+        coletstate = false;
         return new ParallelGroup(
                 new ServoToPosition(lDiff, RConstants.l_vertColet, this),
                 new ServoToPosition(rDiff, RConstants.r_vertColet, this)
@@ -62,7 +75,7 @@ public class Intake extends Subsystem {
     }
 
     public Command hoColet(){
-        state = 2;
+        coletstate = true;
         return new ParallelGroup(
                 new ServoToPosition(lDiff, RConstants.l_hoColet, this),
                 new ServoToPosition(rDiff, RConstants.r_hoColet, this)
@@ -77,7 +90,13 @@ public class Intake extends Subsystem {
         );
     }
 
-
+    public Command coletControl(){
+        if (coletstate == true){
+            return vertColet();
+        } else {
+            return hoColet();
+        }
+    }
 
 
     @Override
@@ -87,6 +106,9 @@ public class Intake extends Subsystem {
         clawIn = OpModeData.INSTANCE.getHardwareMap().get(Servo.class, cname);
         lDiff.setDirection(Servo.Direction.FORWARD);
         rDiff.setDirection(Servo.Direction.REVERSE);
+        clawstate = false;
+        state = -1;
+        coletstate = false;
 
 
     }

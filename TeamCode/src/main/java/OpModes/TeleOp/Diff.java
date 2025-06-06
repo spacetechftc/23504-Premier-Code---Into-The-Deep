@@ -19,7 +19,7 @@ public class Diff extends OpMode{
 
     @Override
     public void init(){
-        garraIn = hardwareMap.get(Servo.class, "ClawIn");
+        garraIn = hardwareMap.get(Servo.class, "clawIn");
         dE = hardwareMap.get(Servo.class, "l_Diff");
         dD = hardwareMap.get(Servo.class, "r_Diff");
         dD.setDirection(Servo.Direction.REVERSE);

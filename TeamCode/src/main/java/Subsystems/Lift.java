@@ -12,6 +12,7 @@ import com.rowanmcalpin.nextftc.ftc.hardware.controllables.RunToPosition;
 import com.rowanmcalpin.nextftc.ftc.hardware.controllables.SetPower;
 
 import Subsystems.Values.LiftPID;
+import Subsystems.Values.RConstants;
 
 
 public class Lift extends Subsystem {
@@ -42,6 +43,31 @@ public class Lift extends Subsystem {
 
     }
 
+    public Command toHigh() {
+        return new ParallelGroup(
+                new RunToPosition(rightLift,
+                        RConstants.HIGHBASKET,
+                        r_liftController),
+                new RunToPosition(leftLift,
+                        RConstants.HIGHBASKET,
+                        l_liftController)
+        );
+
+    }
+    public Command toLow() {
+        return new ParallelGroup(
+                new RunToPosition(rightLift,
+                        RConstants.GROUND,
+                        r_liftController),
+                new RunToPosition(leftLift,
+                        RConstants.GROUND,
+                        l_liftController)
+        );
+
+    }
+
+
+
     public Command powerControl(double power) {
         return new ParallelGroup(
                 new SetPower(leftLift, power),
@@ -52,9 +78,10 @@ public class Lift extends Subsystem {
 
 
 
-    public Command HoldLift(){
+    public Command getDefaltCommand(){
         return new ParallelGroup(
-                new HoldPosition(leftLift, l_liftController)
+                new HoldPosition(leftLift, l_liftController),
+                new HoldPosition(rightLift, l_liftController)
         );
     }
 
@@ -72,5 +99,6 @@ public class Lift extends Subsystem {
 
 
     }
+
 
 }
