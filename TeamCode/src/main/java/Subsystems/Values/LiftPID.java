@@ -10,5 +10,5 @@ public class LiftPID {
     public static double p = 0.01;
     public static double i = 0;
     public static double d = 0;
-    public static double f = 0.01;
+    public static double f = 0.05;
 }

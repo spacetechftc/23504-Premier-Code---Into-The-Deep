@@ -13,8 +13,8 @@ public class RConstants {
     public static double l_hoColet = 0.5;
     public static double r_hoColet = 1;
 
-    public static double l_transf = 0.4;
-    public static double r_tranf = 0.4;
+    public static double l_transf = 0.2;
+    public static double r_tranf = 0.6;
 
     public static int EXTEND_RETRACT = -150;
     public static int EXTEND_EXTENDED = 150;

@@ -44,6 +44,10 @@ public class Extend extends Subsystem {
 
     }
 
+    public Command getDefaltCommand(){
+        return new SetPower(Extend, 0);
+    }
+
     @Override
     public void initialize(){
         Extend = new MotorEx(ename);

@@ -1,5 +1,7 @@
 package Subsystems;
 
+import static com.rowanmcalpin.nextftc.ftc.OpModeData.hardwareMap;
+
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.rowanmcalpin.nextftc.core.Subsystem;
@@ -14,8 +16,11 @@ import Utils.MathUtils;
 
 public class Intake extends Subsystem {
 
+
+
     public static final Intake INSTANCE = new Intake();
-    private Intake(){}
+    public Intake(){
+    }
 
     public Servo lDiff;
     public Servo rDiff;
@@ -28,6 +33,7 @@ public class Intake extends Subsystem {
 
     public int state;
     boolean coletstate;
+    public Vision vision;
 
     public Command CloseClaw(){
         clawstate = false;
@@ -65,6 +71,8 @@ public class Intake extends Subsystem {
     }
 
 
+
+
     public Command vertColet(){
         coletstate = false;
         return new ParallelGroup(
@@ -98,6 +106,11 @@ public class Intake extends Subsystem {
         }
     }
 
+    public Command getDefaltCommand(){
+        vision.update();
+        return null;
+    }
+
 
     @Override
     public void initialize(){
@@ -109,6 +122,9 @@ public class Intake extends Subsystem {
         clawstate = false;
         state = -1;
         coletstate = false;
+        vision = new Vision(hardwareMap);
+        vision.initializeCamera();
+        vision.setLEDPWM();
 
 
     }

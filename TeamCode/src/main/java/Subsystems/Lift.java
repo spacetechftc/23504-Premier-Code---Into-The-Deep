@@ -79,10 +79,8 @@ public class Lift extends Subsystem {
 
 
     public Command getDefaltCommand(){
-        return new ParallelGroup(
-                new HoldPosition(leftLift, l_liftController),
-                new HoldPosition(rightLift, l_liftController)
-        );
+        return new HoldPosition(leftLift, l_liftController).withDeadline(new HoldPosition(rightLift, l_liftController)) ;
+
     }
 
 
