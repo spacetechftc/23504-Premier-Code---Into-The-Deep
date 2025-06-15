@@ -11,23 +11,71 @@ public class out0 extends OpMode {
     Servo outarmr;
     Servo outaxisl;
     Servo outaxisr;
+    Servo clawout;
+
+    double arml_position;
+    double armr_position;
+    double handl_position;
+    double handr_position;
+
+
+    double armcontrol;
+    double handcotrol;
+
 
 
     @Override
     public void init() {
-        outarml = hardwareMap.get(Servo.class, "outarml");
-        outarmr = hardwareMap.get(Servo.class, "outarmr");
-        outaxisl = hardwareMap.get(Servo.class, "outaxisl");
-        outaxisr = hardwareMap.get(Servo.class, "outaxisr");
+        outarml = hardwareMap.get(Servo.class, "l_outarm");
+        outarmr = hardwareMap.get(Servo.class, "r_outarm");
+        outaxisl = hardwareMap.get(Servo.class, "l_outhand");
+        outaxisr = hardwareMap.get(Servo.class, "r_outhand");
+        clawout = hardwareMap.get(Servo.class, "clawOut");
+        outarml.setDirection(Servo.Direction.FORWARD);
+        outarmr.setDirection(Servo.Direction.REVERSE);
+        outaxisr.setDirection(Servo.Direction.REVERSE);
 
     }
 
     @Override
     public void loop() {
-        outaxisr.setPosition(0);
-        outarml.setPosition(0);
-        outarmr.setPosition(0);
-        outaxisl.setPosition(0);
+
+
+
+
+        armcontrol = gamepad2.left_stick_y;
+        handcotrol = gamepad2.right_stick_y;
+
+        armcontrol = ConvertRange(armcontrol, -1, 1, 0, 1);
+        handcotrol = ConvertRange(handcotrol, -1, 1, 0, 1);
+
+
+        outarml.setPosition(armcontrol);
+        outarmr.setPosition(armcontrol);
+
+        outaxisl.setPosition(handcotrol);
+        outaxisr.setPosition(handcotrol);
+
+
+
+
+        arml_position = outarml.getPosition();
+        armr_position = outarmr.getPosition();
+        handl_position = outaxisl.getPosition();
+        handr_position = outaxisr.getPosition();
+
+
+        telemetry.addData("arm l", arml_position);
+        telemetry.addData("arm r", armr_position);
+        telemetry.addData("hand l", handl_position);
+        telemetry.addData("hand r", handr_position);
+
+
+    }
+
+    public double ConvertRange(double x, double in_min, double in_max, double out_min, double out_max){
+
+        return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 
     }
 }

@@ -3,6 +3,7 @@ package Subsystems;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.rowanmcalpin.nextftc.core.Subsystem;
 import com.rowanmcalpin.nextftc.core.command.Command;
+import com.rowanmcalpin.nextftc.core.command.CommandManager;
 import com.rowanmcalpin.nextftc.core.command.groups.ParallelGroup;
 import com.rowanmcalpin.nextftc.core.control.controllers.PIDFController;
 import com.rowanmcalpin.nextftc.core.control.controllers.feedforward.StaticFeedforward;
@@ -79,7 +80,11 @@ public class Lift extends Subsystem {
 
 
     public Command getDefaltCommand(){
-        return new HoldPosition(leftLift, l_liftController).withDeadline(new HoldPosition(rightLift, l_liftController)) ;
+               return new ParallelGroup(
+                       new HoldPosition(leftLift, l_liftController),
+                       new HoldPosition(rightLift, r_liftController)
+               );
+
 
     }
 
@@ -94,6 +99,7 @@ public class Lift extends Subsystem {
         rightLift.resetEncoder();
         rightLift.setDirection(DcMotorSimple.Direction.FORWARD);
         r_liftController.setSetPointTolerance(LiftPID.tollerancer);
+        CommandManager.INSTANCE.scheduleCommand(getDefaltCommand());
 
 
     }

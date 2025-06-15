@@ -7,32 +7,45 @@ import com.pedropathing.pathgen.BezierLine;
 import com.pedropathing.pathgen.Path;
 import com.pedropathing.pathgen.PathChain;
 import com.pedropathing.pathgen.Point;
+import com.qualcomm.ftccommon.CommandList;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.rowanmcalpin.nextftc.core.command.Command;
+import com.rowanmcalpin.nextftc.core.command.groups.ParallelDeadlineGroup;
+import com.rowanmcalpin.nextftc.core.command.groups.ParallelGroup;
 import com.rowanmcalpin.nextftc.core.command.groups.SequentialGroup;
+import com.rowanmcalpin.nextftc.core.command.utility.delays.Delay;
+import com.rowanmcalpin.nextftc.core.command.utility.delays.WaitUntil;
+import com.rowanmcalpin.nextftc.core.units.Angle;
+import com.rowanmcalpin.nextftc.core.units.TimeSpan;
 import com.rowanmcalpin.nextftc.pedro.FollowPath;
 import com.rowanmcalpin.nextftc.pedro.PedroOpMode;
+import com.rowanmcalpin.nextftc.pedro.Turn;
+import com.rowanmcalpin.nextftc.pedro.TurnTo;
 
 import LIb.pedroPathing.constants.FConstants;
 import LIb.pedroPathing.constants.LConstants;
 
 
+import Subsystems.Extend;
+import Subsystems.Intake;
 import Subsystems.Lift;
+import Subsystems.Outtake;
 import Subsystems.Values.RConstants;
 
 @Autonomous(name = "Basket Auto", group = "sides")
 public class BasketPath extends PedroOpMode {
 
     public BasketPath() {
-        super(Lift.INSTANCE);
+        super(Lift.INSTANCE, Extend.INSTANCE, Intake.INSTANCE, Outtake.INSTACE);
     }
 
 
 
-    private final Pose startPose = new Pose(8.5, 112.1, Math.toRadians(0));  // Starting position
-    private final Pose scorePose = new Pose(25.345794392523363, 131.6, Math.toRadians(335)); // Scoring position
+    private final Pose startPose = new Pose(8.074766355140186, 112.14953271028037, Math.toRadians(0));  // Starting position
+    private final Pose scorePose = new Pose(15, 126.953271028037386, Math.toRadians(-45));// Scoring position
+    private final Pose scorePose1 = new Pose(16, 126.95, Math.toRadians(-45)) ;
 
-    private final Pose pickup1Pose = new Pose(26, 127.62616822429908, Math.toRadians(335)); // First sample pickup
+    private final Pose pickup1Pose = new Pose(16, 124.5, Math.toRadians(0)); // First sample pickup
     private final Pose pickup2Pose = new Pose(19.3, 131.6, Math.toRadians(0)); // Second sample pickup
     private final Pose pickup3Pose = new Pose(33.19626168224299, 130.54205607476635, Math.toRadians(45)); // Third sample pickup
 
@@ -59,7 +72,7 @@ public class BasketPath extends PedroOpMode {
 
         /* This is our scorePickup1 PathChain. We are using a single path with a BezierLine, which is a straight line. */
         scorePickup1 = follower.pathBuilder()
-                .addPath(new BezierLine(new Point(pickup1Pose), new Point(scorePose)))
+                .addPath(new BezierLine(new Point(pickup1Pose), new Point(scorePose1)))
                 .setLinearHeadingInterpolation(pickup1Pose.getHeading(), scorePose.getHeading())
                 .build();
 
@@ -103,20 +116,75 @@ public class BasketPath extends PedroOpMode {
 
     public Command preload() {
         return new SequentialGroup(
-                new FollowPath(scorePreload, true).withDeadline(Lift.INSTANCE.toTarget(RConstants.HIGHBASKET)),
-                new FollowPath(grabPickup1),
-                new FollowPath(scorePickup1),
-                new FollowPath(grabPickup2),
-                new FollowPath(scorePickup2),
-                new FollowPath(grabPickup3),
-                new FollowPath(scorePickup3),
-                new FollowPath(submersive),
-                new FollowPath(scoreSubmersive1)
+                Outtake.INSTACE.closeClaw(),
+                liftToScore(),
+                score(),
+                new ParallelGroup(
+                        new FollowPath(grabPickup1),
+                        Extend.INSTANCE.powerControl(1).endAfter(TimeSpan.fromSec(0.6))
+                ),
+                Extend.INSTANCE.powerControl(0),
+                preco(),
+                new FollowPath(scorePickup1).and(colet()),
+                liftToScore(),
+                score()
 
 
         );
 
 
+
+
+
+
+    }
+
+    public Command liftToScore(){
+                return new SequentialGroup(
+                        new ParallelGroup(
+                                new FollowPath(scorePreload),
+                                Lift.INSTANCE.toHigh()
+                        ),
+                        Outtake.INSTACE.bascketScore(),
+                        new Delay(TimeSpan.fromSec(0.4))
+                );
+
+
+
+    }
+
+    public Command score(){
+        return new SequentialGroup(
+                Outtake.INSTACE.openClaw(),
+                new Delay(TimeSpan.fromSec(0.4)),
+                Outtake.INSTACE.neutre(),
+                Lift.INSTANCE.toLow()
+        );
+    }
+
+    public Command preco(){
+        return new SequentialGroup(
+                Intake.INSTANCE.OpenClaw().and(Outtake.INSTACE.openClaw()),
+                Intake.INSTANCE.hoColet(),
+                new Delay(TimeSpan.fromSec(0.5)),
+                Intake.INSTANCE.CloseClaw(),
+                new Delay(TimeSpan.fromSec(0.4))
+        );
+    }
+
+    public Command  colet(){
+        return new SequentialGroup(
+                Intake.INSTANCE.CloseClaw().and(Outtake.INSTACE.neutre()),
+                new Delay(TimeSpan.fromSec(0.28)),
+                Intake.INSTANCE.tranf().and(Extend.INSTANCE.powerControl(-1)),
+                new Delay(TimeSpan.fromSec(0.8)),
+                Extend.INSTANCE.powerControl(0),
+                Outtake.INSTACE.colet(),
+                new Delay(TimeSpan.fromSec(0.5)),
+                Outtake.INSTACE.closeClaw(),
+                new Delay(TimeSpan.fromSec(0.3)),
+                Intake.INSTANCE.OpenClaw()
+        );
     }
 
 
@@ -131,11 +199,19 @@ public class BasketPath extends PedroOpMode {
         follower = new Follower(hardwareMap, FConstants.class, LConstants.class);
         follower.setStartingPose(startPose);
         buildPaths();
+
+        new SequentialGroup(
+                Outtake.INSTACE.neutre()
+        );
+
+
+
     }
 
     @Override
     public void onStartButtonPressed() {
         super.onStartButtonPressed();
+        Lift.INSTANCE.getDefaltCommand().invoke();
         preload().invoke();
 
 

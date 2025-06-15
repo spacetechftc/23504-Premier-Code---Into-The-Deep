@@ -24,18 +24,21 @@ public class Outtake extends Subsystem {
     public String rhand_name = "l_outhand";
 
 
+
     public boolean state;
+    private boolean clawstate;
 
     public Command closeClaw(){
-
+        clawstate = false;
         return new ServoToPosition(
-                ClawOut, 0, this
+                ClawOut, 1, this
         );
     }
 
     public Command openClaw(){
+        clawstate = true;
         return new ServoToPosition(
-                ClawOut, 1, this
+                ClawOut, 0, this
         );
     }
 
@@ -43,9 +46,33 @@ public class Outtake extends Subsystem {
         return new ParallelGroup(
                 new ServoToPosition(l_outarm, 0, this),
                 new ServoToPosition(r_outarm, 0 , this),
-                new ServoToPosition(l_outhand, 0 , this),
-                new ServoToPosition(r_outhand, 0 , this)
+                new ServoToPosition(l_outhand, 0.1502 , this),
+                new ServoToPosition(r_outhand, 0.01502 , this)
         );
+    }
+
+    public Command colet(){
+        return new ParallelGroup(
+                new ServoToPosition(l_outarm, 0.3379, this),
+                new ServoToPosition(r_outarm, 0.3379 , this),
+                new ServoToPosition(l_outhand, 0.48 , this),
+                new ServoToPosition(r_outhand, 0.48 , this)
+        );
+    }
+
+    public Command neutre(){
+        return new ParallelGroup(
+                new ServoToPosition(l_outarm, 0.2503, this),
+                new ServoToPosition(r_outarm, 0.2503 , this),
+                new ServoToPosition(l_outhand, 0.5202 , this),
+                new ServoToPosition(r_outhand, 0.5202 , this)
+        );
+    }
+
+    public Command clawControl(){
+        if(clawstate == true){return closeClaw();} else {
+            return openClaw();
+        }
     }
 
 
@@ -56,6 +83,12 @@ public class Outtake extends Subsystem {
         r_outarm = OpModeData.INSTANCE.getHardwareMap().get(Servo.class, rarm_name);
         l_outhand = OpModeData.INSTANCE.getHardwareMap().get(Servo.class, lhand_name);
         r_outhand = OpModeData.INSTANCE.getHardwareMap().get(Servo.class, rhand_name);
+        l_outarm.setDirection(Servo.Direction.FORWARD);
+        r_outarm.setDirection(Servo.Direction.REVERSE);
+        r_outhand.setDirection(Servo.Direction.REVERSE);
+        clawstate = false;
+
+
 
 
     }

@@ -4,7 +4,7 @@ import com.acmerobotics.dashboard.config.Config;
 @Config
 public class RConstants {
 
-    public static int HIGHBASKET = 2500;
+    public static int HIGHBASKET = 3000;
     public static int GROUND = 0;
 
     public static double l_vertColet = 0.82;

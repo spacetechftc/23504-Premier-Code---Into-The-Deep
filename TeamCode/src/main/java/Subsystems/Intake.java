@@ -57,6 +57,11 @@ public class Intake extends Subsystem {
             return OpenClaw();
         }
     }
+    public Command intakeControl(){
+        if(clawstate == true){return vertColet();} else {
+            return tranf();
+        }
+    }
 
     public Command diffControl(double rotation, double inclination){
         double lAngle = inclination + (rotation/2);
