@@ -5,7 +5,7 @@ import com.acmerobotics.dashboard.config.Config;
 public class RConstants {
 
     public static int HIGHBASKET = 3000;
-    public static int GROUND = 0;
+    public static int GROUND = 10;
 
     public static double l_vertColet = 0.82;
     public static double r_vertColet = 0.72;

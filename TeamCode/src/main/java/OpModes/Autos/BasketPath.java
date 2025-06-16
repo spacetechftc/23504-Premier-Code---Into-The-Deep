@@ -42,12 +42,13 @@ public class BasketPath extends PedroOpMode {
 
 
     private final Pose startPose = new Pose(8.074766355140186, 112.14953271028037, Math.toRadians(0));  // Starting position
-    private final Pose scorePose = new Pose(15, 126.953271028037386, Math.toRadians(-45));// Scoring position
-    private final Pose scorePose1 = new Pose(16, 126.95, Math.toRadians(-45)) ;
+    private final Pose scorePose = new Pose(15.3, 126.953271028037386, Math.toRadians(-45));// Scoring position
+    private final Pose scorePose1 = new Pose(30.8, 127.5, Math.toRadians(-37)) ;
+    private final Pose scorePose2 = new Pose(32.8, 127.5, Math.toRadians(-35)) ;
 
-    private final Pose pickup1Pose = new Pose(16, 124.5, Math.toRadians(0)); // First sample pickup
-    private final Pose pickup2Pose = new Pose(19.3, 131.6, Math.toRadians(0)); // Second sample pickup
-    private final Pose pickup3Pose = new Pose(33.19626168224299, 130.54205607476635, Math.toRadians(45)); // Third sample pickup
+    private final Pose pickup1Pose = new Pose(16, 124.6, Math.toRadians(0)); // First sample pickup
+    private final Pose pickup2Pose = new Pose(20, 133.2, Math.toRadians(0)); // Second sample pickup
+    private final Pose pickup3Pose = new Pose(34, 118.3, Math.toRadians(68)); // Third sample pickup
 
     private final Pose pickup1Submersive = new Pose(60, 98, Math.toRadians(270)); // Parking position
     private final Pose submersiveControlPose = new Pose(64.59813084112149, 102.2803738317757, Math.toRadians(0));
@@ -78,27 +79,26 @@ public class BasketPath extends PedroOpMode {
 
         /* This is our grabPickup2 PathChain. We are using a single path with a BezierLine, which is a straight line. */
         grabPickup2 = follower.pathBuilder()
-                .addPath(new BezierLine(new Point(scorePose), new Point(pickup2Pose)))
+                .addPath(new BezierLine(new Point(scorePose1), new Point(pickup2Pose)))
                 .setLinearHeadingInterpolation(scorePose.getHeading(), pickup2Pose.getHeading())
                 .build();
 
         /* This is our scorePickup2 PathChain. We are using a single path with a BezierLine, which is a straight line. */
         scorePickup2 = follower.pathBuilder()
-                .addPath(new BezierLine(new Point(pickup2Pose), new Point(scorePose)))
+                .addPath(new BezierLine(new Point(pickup2Pose), new Point(scorePose1)))
                 .setLinearHeadingInterpolation(pickup2Pose.getHeading(), scorePose.getHeading())
                 .build();
 
         /* This is our grabPickup3 PathChain. We are using a single path with a BezierLine, which is a straight line. */
         grabPickup3 = follower.pathBuilder()
-                .addPath(new BezierLine(new Point(scorePose), new Point(pickup3Pose)))
+                .addPath(new BezierLine(new Point(scorePose1), new Point(pickup3Pose)))
                 .setLinearHeadingInterpolation(scorePose.getHeading(), pickup3Pose.getHeading())
                 .build();
 
         /* This is our scorePickup3 PathChain. We are using a single path with a BezierLine, which is a straight line. */
         scorePickup3 = follower.pathBuilder()
-                .addPath(new BezierLine(new Point(pickup3Pose), new Point(scorePose)))
-                .setTangentHeadingInterpolation()
-                .setReversed(true)
+                .addPath(new BezierLine(new Point(pickup3Pose), new Point(scorePose2)))
+                .setLinearHeadingInterpolation(pickup3Pose.getHeading(), scorePose2.getHeading())
                 .build();
 
 
@@ -116,6 +116,7 @@ public class BasketPath extends PedroOpMode {
 
     public Command preload() {
         return new SequentialGroup(
+                Outtake.INSTACE.neutre(),
                 Outtake.INSTACE.closeClaw(),
                 liftToScore(),
                 score(),
@@ -127,7 +128,26 @@ public class BasketPath extends PedroOpMode {
                 preco(),
                 new FollowPath(scorePickup1).and(colet()),
                 liftToScore(),
+                score(),
+                new ParallelGroup(
+                        new FollowPath(grabPickup2),
+                        Extend.INSTANCE.powerControl(1).endAfter(TimeSpan.fromSec(0.6))
+                ),
+                Extend.INSTANCE.powerControl(0),
+                preco(),
+                new FollowPath(scorePickup2).and(colet()),
+                liftToScore(),
+                score(),
+                new ParallelGroup(
+                        new FollowPath(grabPickup3),
+                        Extend.INSTANCE.powerControl(1).endAfter(TimeSpan.fromSec(0.6))
+                ),
+                Extend.INSTANCE.powerControl(0),
+                preco3(),
+                new FollowPath(scorePickup3, true, 0.75).afterTime(0.2).and(colet()),
+                liftToScore(),
                 score()
+
 
 
         );
@@ -146,7 +166,7 @@ public class BasketPath extends PedroOpMode {
                                 Lift.INSTANCE.toHigh()
                         ),
                         Outtake.INSTACE.bascketScore(),
-                        new Delay(TimeSpan.fromSec(0.4))
+                        new Delay(TimeSpan.fromSec(0.55))
                 );
 
 
@@ -172,6 +192,16 @@ public class BasketPath extends PedroOpMode {
         );
     }
 
+    public Command preco3(){
+        return new SequentialGroup(
+                Intake.INSTANCE.OpenClaw().and(Outtake.INSTACE.openClaw()),
+                Intake.INSTANCE.vertColet(),
+                new Delay(TimeSpan.fromSec(0.6)),
+                Intake.INSTANCE.CloseClaw(),
+                new Delay(TimeSpan.fromSec(0.6))
+        );
+    }
+
     public Command  colet(){
         return new SequentialGroup(
                 Intake.INSTANCE.CloseClaw().and(Outtake.INSTACE.neutre()),
@@ -179,11 +209,13 @@ public class BasketPath extends PedroOpMode {
                 Intake.INSTANCE.tranf().and(Extend.INSTANCE.powerControl(-1)),
                 new Delay(TimeSpan.fromSec(0.8)),
                 Extend.INSTANCE.powerControl(0),
+                Outtake.INSTACE.neutre(),
                 Outtake.INSTACE.colet(),
                 new Delay(TimeSpan.fromSec(0.5)),
                 Outtake.INSTACE.closeClaw(),
                 new Delay(TimeSpan.fromSec(0.3)),
-                Intake.INSTANCE.OpenClaw()
+                Intake.INSTANCE.OpenClaw(),
+                new Delay(TimeSpan.fromSec(0.2))
         );
     }
 

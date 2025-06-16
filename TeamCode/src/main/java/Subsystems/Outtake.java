@@ -53,8 +53,8 @@ public class Outtake extends Subsystem {
 
     public Command colet(){
         return new ParallelGroup(
-                new ServoToPosition(l_outarm, 0.3379, this),
-                new ServoToPosition(r_outarm, 0.3379 , this),
+                new ServoToPosition(l_outarm, 0.31, this),
+                new ServoToPosition(r_outarm, 0.31 , this),
                 new ServoToPosition(l_outhand, 0.48 , this),
                 new ServoToPosition(r_outhand, 0.48 , this)
         );
@@ -64,8 +64,8 @@ public class Outtake extends Subsystem {
         return new ParallelGroup(
                 new ServoToPosition(l_outarm, 0.2503, this),
                 new ServoToPosition(r_outarm, 0.2503 , this),
-                new ServoToPosition(l_outhand, 0.5202 , this),
-                new ServoToPosition(r_outhand, 0.5202 , this)
+                new ServoToPosition(l_outhand, 0.48 , this),
+                new ServoToPosition(r_outhand, 0.482 , this)
         );
     }
 
