@@ -60,6 +60,16 @@ public class Outtake extends Subsystem {
         );
     }
 
+
+    public Command speccolet(){
+        return new ParallelGroup(
+                new ServoToPosition(l_outarm, 0.7247, this),
+                new ServoToPosition(r_outarm, 0.7247 , this),
+                new ServoToPosition(l_outhand, 0.3963 , this),
+                new ServoToPosition(r_outhand, 0.3963 , this)
+        );
+    }
+
     public Command neutre(){
         return new ParallelGroup(
                 new ServoToPosition(l_outarm, 0.2503, this),

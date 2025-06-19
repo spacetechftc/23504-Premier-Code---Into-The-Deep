@@ -152,6 +152,11 @@ public class TeleOpPremier extends NextFTCOpMode {
 
         );
 
+        gamepadManager.getGamepad2().getDpadLeft().setPressedCommand(
+                () -> new SequentialGroup(
+                        Lift.INSTANCE.toSpecColet()
+                ));
+
         gamepadManager.getGamepad2().getRightBumper().setPressedCommand(() -> {
             vision.update();
             double grau = vision.getTurnServoDegree();

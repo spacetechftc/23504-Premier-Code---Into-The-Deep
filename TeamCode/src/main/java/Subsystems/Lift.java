@@ -67,6 +67,18 @@ public class Lift extends Subsystem {
 
     }
 
+    public Command toSpecColet() {
+        return new ParallelGroup(
+                new RunToPosition(rightLift,
+                        RConstants.HIGHBASKET,
+                        r_liftController),
+                new RunToPosition(leftLift,
+                        RConstants.HIGHBASKET,
+                        l_liftController)
+        );
+
+    }
+
 
 
     public Command powerControl(double power) {
