@@ -40,22 +40,21 @@ public class BasketPath extends PedroOpMode {
     }
 
 
-
     private final Pose startPose = new Pose(8.074766355140186, 112.14953271028037, Math.toRadians(0));  // Starting position
     private final Pose scorePose = new Pose(15.3, 126.953271028037386, Math.toRadians(-45));// Scoring position
-    private final Pose scorePose1 = new Pose(30, 128, Math.toRadians(-39)) ;
-    private final Pose scorePose2 = new Pose(32.8, 127.5, Math.toRadians(-35)) ;
+    private final Pose scorePose1 = new Pose(30, 128, Math.toRadians(-39));
+    private final Pose scorePose2 = new Pose(32.8, 127.5, Math.toRadians(-35));
 
     private final Pose pickup1Pose = new Pose(16, 124.6, Math.toRadians(0)); // First sample pickup
-    private final Pose pickup2Pose = new Pose(20.8, 133.5, Math.toRadians(0)); // Second sample pickup
-    private final Pose pickup3Pose = new Pose(34.2, 119, Math.toRadians(67)); // Third sample pickup
+    private final Pose pickup2Pose = new Pose(19.8, 133.5, Math.toRadians(0)); // Second sample pickup
+    private final Pose pickup3Pose = new Pose(34, 119, Math.toRadians(68)); // Third sample pickup
 
     private final Pose pickup1Submersive = new Pose(60, 98, Math.toRadians(270)); // Parking position
     private final Pose submersiveControlPose = new Pose(64.59813084112149, 102.2803738317757, Math.toRadians(0));
 
 
     private Path scorePreload, submersive;
-    private PathChain  grabPickup1, grabPickup2, grabPickup3, scorePickup1, scorePickup2, scorePickup3, scoreSubmersive1;
+    private PathChain grabPickup1, grabPickup2, grabPickup3, scorePickup1, scorePickup2, scorePickup3, scoreSubmersive1;
 
     public void buildPaths() {
         /* This is our scorePreload path. We are using a BezierLine, which is a straight line. */
@@ -149,31 +148,25 @@ public class BasketPath extends PedroOpMode {
                 score()
 
 
-
         );
 
 
+    }
 
-
+    public Command liftToScore() {
+        return new SequentialGroup(
+                new ParallelGroup(
+                        new FollowPath(scorePreload),
+                        Lift.INSTANCE.toHigh()
+                ),
+                Outtake.INSTACE.bascketScore(),
+                new Delay(TimeSpan.fromSec(0.55))
+        );
 
 
     }
 
-    public Command liftToScore(){
-                return new SequentialGroup(
-                        new ParallelGroup(
-                                new FollowPath(scorePreload),
-                                Lift.INSTANCE.toHigh()
-                        ),
-                        Outtake.INSTACE.bascketScore(),
-                        new Delay(TimeSpan.fromSec(0.55))
-                );
-
-
-
-    }
-
-    public Command score(){
+    public Command score() {
         return new SequentialGroup(
                 Outtake.INSTACE.openClaw(),
                 new Delay(TimeSpan.fromSec(0.4)),
@@ -182,7 +175,7 @@ public class BasketPath extends PedroOpMode {
         );
     }
 
-    public Command preco(){
+    public Command preco() {
         return new SequentialGroup(
                 Intake.INSTANCE.OpenClaw().and(Outtake.INSTACE.openClaw()),
                 Intake.INSTANCE.hoColet(),
@@ -192,7 +185,7 @@ public class BasketPath extends PedroOpMode {
         );
     }
 
-    public Command preco3(){
+    public Command preco3() {
         return new SequentialGroup(
                 Intake.INSTANCE.OpenClaw().and(Outtake.INSTACE.openClaw()),
                 Intake.INSTANCE.vertColet(),
@@ -202,7 +195,7 @@ public class BasketPath extends PedroOpMode {
         );
     }
 
-    public Command  colet(){
+    public Command colet() {
         return new SequentialGroup(
                 Intake.INSTANCE.CloseClaw().and(Outtake.INSTACE.neutre()),
                 new Delay(TimeSpan.fromSec(0.28)),
@@ -220,10 +213,9 @@ public class BasketPath extends PedroOpMode {
     }
 
 
-
-
-
-    /** This method is called once at the init of the OpMode. **/
+    /**
+     * This method is called once at the init of the OpMode.
+     **/
 
 
     @Override
@@ -235,7 +227,6 @@ public class BasketPath extends PedroOpMode {
         new SequentialGroup(
                 Outtake.INSTACE.neutre()
         );
-
 
 
     }
