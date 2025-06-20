@@ -154,7 +154,16 @@ public class TeleOpPremier extends NextFTCOpMode {
 
         gamepadManager.getGamepad2().getDpadLeft().setPressedCommand(
                 () -> new SequentialGroup(
-                        Lift.INSTANCE.toSpecColet()
+                        Lift.INSTANCE.toSpecColet(),
+                        new Delay(TimeSpan.fromSec(0.1)),
+                        Outtake.INSTACE.prespeccolet(),
+                        Outtake.INSTACE.speccolet()
+                ));
+
+        gamepadManager.getGamepad2().getDpadLeft().setPressedCommand(
+                () -> new SequentialGroup(
+                        Lift.INSTANCE.toSpecColet(),
+                        Outtake.INSTACE.speccolet()
                 ));
 
         gamepadManager.getGamepad2().getRightBumper().setPressedCommand(() -> {

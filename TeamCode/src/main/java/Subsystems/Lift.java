@@ -70,10 +70,10 @@ public class Lift extends Subsystem {
     public Command toSpecColet() {
         return new ParallelGroup(
                 new RunToPosition(rightLift,
-                        RConstants.HIGHBASKET,
+                        RConstants.SPECCOLET,
                         r_liftController),
                 new RunToPosition(leftLift,
-                        RConstants.HIGHBASKET,
+                        RConstants.SPECCOLET,
                         l_liftController)
         );
 

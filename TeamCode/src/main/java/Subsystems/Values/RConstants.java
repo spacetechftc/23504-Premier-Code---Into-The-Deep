@@ -6,7 +6,7 @@ public class RConstants {
 
     public static int HIGHBASKET = 3000;
     public static int GROUND = 10;
-    public static int SPECCOLET = 200;
+    public static int SPECCOLET = 320;
 
     public static double l_vertColet = 0.82;
     public static double r_vertColet = 0.72;

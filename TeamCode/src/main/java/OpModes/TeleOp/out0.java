@@ -22,6 +22,14 @@ public class out0 extends OpMode {
     double armcontrol;
     double handcotrol;
 
+    boolean fixe;
+
+
+    double lastarml;
+    double lastarmr;
+    double lasthandl;
+    double lasthandr;
+
 
 
     @Override
@@ -34,6 +42,7 @@ public class out0 extends OpMode {
         outarml.setDirection(Servo.Direction.FORWARD);
         outarmr.setDirection(Servo.Direction.REVERSE);
         outaxisr.setDirection(Servo.Direction.REVERSE);
+        fixe = false;
 
     }
 
@@ -42,28 +51,42 @@ public class out0 extends OpMode {
 
 
 
+        if(fixe == false) {
+            armcontrol = gamepad2.left_stick_y;
+            handcotrol = gamepad2.right_stick_y;
+            armcontrol = ConvertRange(armcontrol, -1, 1, 0, 1);
+            handcotrol = ConvertRange(handcotrol, -1, 1, 0, 1);
 
-        armcontrol = gamepad2.left_stick_y;
-        handcotrol = gamepad2.right_stick_y;
+            outarml.setPosition(armcontrol);
+            outarmr.setPosition(armcontrol);
 
-        armcontrol = ConvertRange(armcontrol, -1, 1, 0, 1);
-        handcotrol = ConvertRange(handcotrol, -1, 1, 0, 1);
+            outaxisl.setPosition(handcotrol);
+            outaxisr.setPosition(handcotrol);
 
+            arml_position = outarml.getPosition();
+            armr_position = outarmr.getPosition();
+            handl_position = outaxisl.getPosition();
+            handr_position = outaxisr.getPosition();
+        } else {
+            outarml.setPosition(lastarml);
+            outarmr.setPosition(lastarmr);
 
-        outarml.setPosition(armcontrol);
-        outarmr.setPosition(armcontrol);
+            outaxisl.setPosition(lasthandl);
+            outaxisr.setPosition(lasthandr);
+        }
 
-        outaxisl.setPosition(handcotrol);
-        outaxisr.setPosition(handcotrol);
+        if(gamepad2.right_bumper == true){
+            if(fixe == false){
+                fixe = true;
+                lastarml = arml_position;
+                lastarmr = armr_position;
+                lasthandl = handl_position;
+                lasthandr = handr_position;
 
-
-
-
-        arml_position = outarml.getPosition();
-        armr_position = outarmr.getPosition();
-        handl_position = outaxisl.getPosition();
-        handr_position = outaxisr.getPosition();
-
+            } else{
+                fixe = false;
+            }
+        }
 
         telemetry.addData("arm l", arml_position);
         telemetry.addData("arm r", armr_position);
