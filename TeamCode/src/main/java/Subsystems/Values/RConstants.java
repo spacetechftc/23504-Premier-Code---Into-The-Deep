@@ -5,8 +5,12 @@ import com.acmerobotics.dashboard.config.Config;
 public class RConstants {
 
     public static int HIGHBASKET = 3000;
+    public static int HIGHCHAMBER = 2100;
+    public static int SCORECLIP = 1900;
+    public static int ACENT = 3500;
+
     public static int GROUND = 10;
-    public static int SPECCOLET = 320;
+    public static int SPECCOLET = 530;
 
     public static double l_vertColet = 0.82;
     public static double r_vertColet = 0.72;

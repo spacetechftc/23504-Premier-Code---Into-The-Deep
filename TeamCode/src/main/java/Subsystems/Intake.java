@@ -33,6 +33,7 @@ public class Intake extends Subsystem {
 
     public int state;
     boolean coletstate;
+    public boolean isColetstate;
     public Vision vision;
 
     public Command CloseClaw(){
@@ -80,6 +81,7 @@ public class Intake extends Subsystem {
 
     public Command vertColet(){
         coletstate = false;
+        isColetstate = true;
         return new ParallelGroup(
                 new ServoToPosition(lDiff, RConstants.l_vertColet, this),
                 new ServoToPosition(rDiff, RConstants.r_vertColet, this)
@@ -89,6 +91,7 @@ public class Intake extends Subsystem {
 
     public Command hoColet(){
         coletstate = true;
+        isColetstate = true;
         return new ParallelGroup(
                 new ServoToPosition(lDiff, RConstants.l_hoColet, this),
                 new ServoToPosition(rDiff, RConstants.r_hoColet, this)
@@ -97,6 +100,7 @@ public class Intake extends Subsystem {
 
     public Command tranf(){
         state = 0;
+        isColetstate = false;
         return new ParallelGroup(
                 new ServoToPosition(lDiff, RConstants.l_transf, this),
                 new ServoToPosition(rDiff, RConstants.r_tranf, this)
@@ -130,6 +134,7 @@ public class Intake extends Subsystem {
         vision = new Vision(hardwareMap);
         vision.initializeCamera();
         vision.setLEDPWM();
+        isColetstate = false;
 
 
     }

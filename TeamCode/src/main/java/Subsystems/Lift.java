@@ -67,6 +67,21 @@ public class Lift extends Subsystem {
 
     }
 
+
+    public Command acent(){
+        return new ParallelGroup(
+                new RunToPosition(rightLift,
+                        RConstants.ACENT,
+                        r_liftController),
+                new RunToPosition(leftLift,
+                        RConstants.ACENT,
+                        l_liftController
+
+                )
+
+        );
+    }
+
     public Command toSpecColet() {
         return new ParallelGroup(
                 new RunToPosition(rightLift,
@@ -79,6 +94,29 @@ public class Lift extends Subsystem {
 
     }
 
+    public Command toHighChamber() {
+        return new ParallelGroup(
+                new RunToPosition(rightLift,
+                        RConstants.HIGHCHAMBER,
+                        r_liftController),
+                new RunToPosition(leftLift,
+                        RConstants.HIGHCHAMBER,
+                        l_liftController)
+        );
+
+    }
+
+    public Command scoreclip() {
+        return new ParallelGroup(
+                new RunToPosition(rightLift,
+                        RConstants.SCORECLIP,
+                        r_liftController),
+                new RunToPosition(leftLift,
+                        RConstants.SCORECLIP,
+                        l_liftController)
+        );
+
+    }
 
 
     public Command powerControl(double power) {

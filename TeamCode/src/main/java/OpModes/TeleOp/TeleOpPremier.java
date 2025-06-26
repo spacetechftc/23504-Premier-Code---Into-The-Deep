@@ -3,9 +3,12 @@ package OpModes.TeleOp;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.rowanmcalpin.nextftc.core.command.Command;
+import com.rowanmcalpin.nextftc.core.command.CommandManager;
 import com.rowanmcalpin.nextftc.core.command.groups.ParallelDeadlineGroup;
 import com.rowanmcalpin.nextftc.core.command.groups.ParallelGroup;
 import com.rowanmcalpin.nextftc.core.command.groups.SequentialGroup;
+import com.rowanmcalpin.nextftc.core.command.utility.ForcedParallelCommand;
+import com.rowanmcalpin.nextftc.core.command.utility.conditionals.BlockingConditionalCommand;
 import com.rowanmcalpin.nextftc.core.command.utility.delays.Delay;
 import com.rowanmcalpin.nextftc.core.command.utility.delays.WaitUntil;
 import com.rowanmcalpin.nextftc.core.units.TimeSpan;
@@ -49,8 +52,21 @@ public class TeleOpPremier extends NextFTCOpMode {
     double angle;
 
     public Vision vision;
+    public boolean AutoALign;
 
+    public Command AutoALign(){
+        vision.update();
+        double grau = vision.getTurnServoDegree();
+        telemetry.addData("angle", grau);
+        telemetry.update();
+        telemetry.update();
+        if (grau < 10 || grau > 130) {
+           return Intake.INSTANCE.hoColet();
+        } else {
+            return Intake.INSTANCE.vertColet();
+        }
 
+    }
 
     @Override
     public void onInit() {
@@ -74,6 +90,8 @@ public class TeleOpPremier extends NextFTCOpMode {
         Intake.INSTANCE.getDefaltCommand();
         Outtake.INSTACE.colet();
 
+        AutoALign = false;
+
 
 
 
@@ -87,17 +105,45 @@ public class TeleOpPremier extends NextFTCOpMode {
         Lift.INSTANCE.getDefaltCommand().invoke();
 
 
+        gamepadManager.getGamepad2().getLeftTrigger().setPressedCommand(
+                value -> Outtake.INSTACE.clawControl()
+        );
+
+        gamepadManager.getGamepad2().getRightBumper().setPressedCommand(
+                () -> Intake.INSTANCE.tranf()
+        );
+
         gamepadManager.getGamepad2().getRightTrigger().setPressedCommand(
                 value -> Intake.INSTANCE.clawControl()
         );
 
-        gamepadManager.getGamepad2().getB().setPressedCommand(
-                () -> Intake.INSTANCE.intakeControl()
+
+
+
+
+
+        gamepadManager.getGamepad1().getDpadDown().setPressedCommand(
+                () -> new SequentialGroup(
+                        Lift.INSTANCE.scoreclip(),
+                        new Delay(TimeSpan.fromSec(0.5)),
+                        Outtake.INSTACE.openClaw(),
+                        new Delay(TimeSpan.fromSec(0.1)),
+                        Lift.INSTANCE.toSpecColet()
+
+                )
+
+
+
         );
 
-        gamepadManager.getGamepad2().getRightTrigger().setPressedCommand(
-                value -> Outtake.INSTACE.clawControl()
+
+        gamepadManager.getGamepad1().getDpadUp().setPressedCommand(
+                () -> new SequentialGroup(
+                        Lift.INSTANCE.toHighChamber()
+                        )
+
         );
+
 
 
 
@@ -120,7 +166,7 @@ public class TeleOpPremier extends NextFTCOpMode {
 
         gamepadManager.getGamepad2().getX().setPressedCommand(
                 () -> new SequentialGroup(
-                        Intake.INSTANCE.CloseClaw().and(Outtake.INSTACE.neutre()),
+                        Intake.INSTANCE.CloseClaw().and(Outtake.INSTACE.neutre()).and(Outtake.INSTACE.openClaw()),
                         new Delay(TimeSpan.fromSec(0.28)),
                         Intake.INSTANCE.tranf().and(Extend.INSTANCE.powerControl(-1)),
                         new Delay(TimeSpan.fromSec(0.5)),
@@ -134,7 +180,13 @@ public class TeleOpPremier extends NextFTCOpMode {
                 )
         );
 
+        gamepadManager.getGamepad1().getY().setReleasedCommand(
+                () -> Lift.INSTANCE.acent()
+        );
 
+        gamepadManager.getGamepad1().getA().setReleasedCommand(
+                () -> Lift.INSTANCE.toLow()
+        );
 
         gamepadManager.getGamepad2().getDpadUp().setPressedCommand(
                 () -> new SequentialGroup(
@@ -155,36 +207,17 @@ public class TeleOpPremier extends NextFTCOpMode {
         gamepadManager.getGamepad2().getDpadLeft().setPressedCommand(
                 () -> new SequentialGroup(
                         Lift.INSTANCE.toSpecColet(),
-                        new Delay(TimeSpan.fromSec(0.1)),
-                        Outtake.INSTACE.prespeccolet(),
                         Outtake.INSTACE.speccolet()
                 ));
 
-        gamepadManager.getGamepad2().getDpadLeft().setPressedCommand(
-                () -> new SequentialGroup(
-                        Lift.INSTANCE.toSpecColet(),
-                        Outtake.INSTACE.speccolet()
-                ));
 
-        gamepadManager.getGamepad2().getRightBumper().setPressedCommand(() -> {
-            vision.update();
-            double grau = vision.getTurnServoDegree();
-            telemetry.addData("angle", grau);
-            telemetry.update();
-            telemetry.update();
-            if (grau < 10 || grau >130) {
-                return Intake.INSTANCE.hoColet();
-            } else {
-                return Intake.INSTANCE.vertColet();
-            }
-
-
-        });
-
-
-
-
-
+        gamepadManager.getGamepad2().getB().setPressedCommand(() ->
+            new BlockingConditionalCommand(
+                    ()-> Intake.INSTANCE.isColetstate == true,
+                    ()-> Intake.INSTANCE.coletControl(),
+                    ()-> AutoALign()
+            )
+        );
 
 
     }
